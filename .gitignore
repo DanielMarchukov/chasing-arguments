@@ -8,4 +8,6 @@
 
 # IntelliJ IDEA
 **/.idea
+
+# Sensitive info
 key_secret.py
