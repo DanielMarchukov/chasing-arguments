@@ -1,4 +1,4 @@
-from six.moves.urllib.request import urlretrieve
+from datasets import CheckDownloadUnzipData
 from model import Model
 from lstm import LSTM
 
@@ -7,53 +7,10 @@ import tensorflow as tf
 import os
 import time
 import datetime
-import zipfile
 
-glove_zip_file = "\\data\\GloVe\\glove.6B.zip"
-glove_vectors_50d = "\\data\\GloVe\\glove.6B.50d.txt"
-glove_vectors_100d = "\\data\\GloVe\\glove.6B.100d.txt"
-glove_vectors_200d = "\\data\\GloVe\\glove.6B.200d.txt"
-glove_vectors_300d = "\\data\\GloVe\\glove.6B.300d.txt"
-glove_vectors_840B_300d = "\\data\\GloVe\\glove.840B.300d.txt"
-snli_zip_file = "\\data\\SNLI\\snli_1.0.zip"
-
-snli_dev_file = "\\data\\SNLI\\snli_1.0_dev.txt"
-snli_test_file = "\\data\\SNLI\\snli_1.0_test.txt"
-snli_full_dataset_file = "\\data\\SNLI\\snli_1.0_train.txt"
-
-print("Checking for data sets, downloading if needed...")
-
-
-# def unzip_single_file(zip_file_name, output_file_name):
-#     if not os.path.isfile(output_file_name):
-#         with open(output_file_name, 'wb') as out_file:
-#             with zipfile.ZipFile(zip_file_name) as zipped:
-#                 for info in zipped.infolist():
-#                     if output_file_name in info.filename:
-#                         with zipped.open(info) as requested_file:
-#                             out_file.write(requested_file.read())
-#                             return
-#
-#
-# if not os.path.isfile(glove_zip_file) and (not os.path.isfile(glove_vectors_50d)
-#                                            or not os.path.isfile(glove_vectors_100d)
-#                                            or not os.path.isfile(glove_vectors_200d)
-#                                            or not os.path.isfile(glove_vectors_300d)):
-#     urlretrieve("http://nlp.stanford.edu/data/glove.6B.zip", glove_zip_file)
-#
-# if not os.path.isfile(snli_zip_file) and (not os.path.isfile(snli_full_dataset_file)
-#                                           or not os.path.isfile(snli_dev_file)
-#                                           or not os.path.isfile(snli_test_file)):
-#     urlretrieve("https://nlp.stanford.edu/projects/snli/snli_1.0.zip", snli_zip_file)
-#
-# unzip_single_file(glove_zip_file, glove_vectors_50d)
-# unzip_single_file(glove_zip_file, glove_vectors_100d)
-# unzip_single_file(glove_zip_file, glove_vectors_200d)
-# unzip_single_file(glove_zip_file, glove_vectors_300d)
-# unzip_single_file(glove_zip_file, glove_vectors_840B_300d)
-# unzip_single_file(snli_zip_file, snli_full_dataset_file)
-# unzip_single_file(snli_zip_file, snli_dev_file)
-# unzip_single_file(snli_zip_file, snli_test_file)
+print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
+      " Checking for data sets, downloading if needed...")
+# CheckDownloadUnzipData.check_all_unzip()
 
 training = True
 restore = False
