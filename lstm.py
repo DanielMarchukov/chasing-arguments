@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from model import Model
 
 import tensorflow as tf
 import numpy as np
@@ -180,3 +181,20 @@ class LSTM:
             print("Testing Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(testing_iterations.iterable)) +
                   ", Testing Accuracy = " + "{:.5f}".format(acc / len(testing_iterations.iterable)))
             print("------------------------------------------------------------------------------")
+
+    def run_textual_entailment(self, evi_sentence, hyp_sentence):
+        with tf.device("/device:GPU:0"):
+            evi_sentence = [self.__model.fit_to_size(np.vstack(
+                self.__model.sentence2sequence(evi_sentence)[0]),
+                (self.__model.max_evidence_length, self.__model.vector_size))]
+
+            hyp_sentence = [self.__model.fit_to_size(np.vstack(
+                self.__model.sentence2sequence(hyp_sentence)[0]),
+                (self.__model.max_hypothesis_length, self.__model.vector_size))]
+
+            prediction = self.__sess.run(self.__model.classification_scores,
+                                         feed_dict={self.__hyp: (evi_sentence * self.__model.batch_size),
+                                                    self.__evi: (hyp_sentence * self.__model.batch_size),
+                                                    self.__y: [[0, 0, 0]] * self.__model.batch_size})
+
+        return ["E", "N", "C"][np.argmax(prediction[0])]
