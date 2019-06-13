@@ -1,0 +1,10 @@
+# Datasets
+**/data
+**/models
+**/__pycache__
+
+# Jupyter
+**/.ipynb_chokepoints
+
+# IntelliJ IDEA
+**/.idea
