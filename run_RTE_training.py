@@ -61,7 +61,6 @@ model_path = os.getcwd() + '\\models\\rnn-840B-300d-6m-300-final'
 
 print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Initializing model...")
 model = Model()
-model.vector_size = 200
 
 print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Setting up GloVe word map...")
 model.setup_word_map(file="\\data\\GloVe\\glove.840B.300d.txt")

@@ -9,7 +9,7 @@ class Model:
         self.max_hypothesis_length = 50
         self.max_evidence_length = 50
         self.batch_size = 512
-        self.vector_size = 200
+        self.vector_size = 256
         self.hidden_size = 4096
         self.n_classes = 3
         self.weight_decay = 0.95
