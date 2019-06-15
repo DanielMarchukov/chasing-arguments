@@ -2,26 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plot
 import matplotlib.ticker as ticker
 import csv
+import time
+import datetime
 
 
-class Model:
+class Params:
     def __init__(self):
-        self.max_hypothesis_length = 50
-        self.max_evidence_length = 50
+        self.max_hypothesis_length = 30
+        self.max_evidence_length = 30
         self.batch_size = 512
-        self.vector_size = 256
-        self.hidden_size = 4096
+        self.hidden_size = 1024
+        self.vector_size = 128
         self.n_classes = 3
         self.weight_decay = 0.95
         self.learning_rate = 0.001
-        self.input_keep = 0.1
-        self.output_keep = 0.1
-        self.static_keep = 1.0
-        self.iterations = 6000000
+        self.iterations = 5000000
         self.display_step = 100
         self.__glove_word_map = {}
 
-    def setup_word_map(self, file="glove.6B.200d.txt"):
+    def setup_word_map(self, file):
         with open(file, "r", encoding="utf-8") as glove:
             for line in glove:
                 name, vector = tuple(line.split(" ", 1))
@@ -78,24 +77,23 @@ class Model:
                     i = i - 1
         return rows, words
 
-    def split_data_into_scores(self, file):
-        import gc
-        gc.enable()
+    def update_data_scores(self, file):
         with open(file, "r") as data:
             train = csv.DictReader(data, delimiter='\t')
             evi_sentences = []
             hyp_sentences = []
-            # labels = []
             scores = []
             for row in train:
                 hyp_sentences.append(np.vstack(self.sentence2sequence(row["sentence1"].lower())[0]))
                 evi_sentences.append(np.vstack(self.sentence2sequence(row["sentence2"].lower())[0]))
-                # labels.append(row["gold_label"])
                 scores.append(self.score_setup(row))
-
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking hyp_sentences...")
         hyp_sentences = np.stack([self.fit_to_size(x, (self.max_hypothesis_length, self.vector_size))
                                   for x in hyp_sentences])
+
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking evi_sentences...")
         evi_sentences = np.stack([self.fit_to_size(x, (self.max_evidence_length, self.vector_size))
                                   for x in evi_sentences])
 
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " update_data_scores: Done.")
         return (hyp_sentences, evi_sentences), np.array(scores)

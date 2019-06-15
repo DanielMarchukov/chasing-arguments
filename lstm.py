@@ -1,5 +1,4 @@
 from tqdm import tqdm
-from model import Model
 
 import tensorflow as tf
 import numpy as np
@@ -7,40 +6,46 @@ import os
 
 
 class LSTM:
-    def __init__(self, model):
-        self.__model = model
+    def __init__(self, params):
+        self.__params = params
         self.__hyp = tf.placeholder(tf.float32,
-                                    [model.batch_size, model.max_hypothesis_length, model.vector_size],
+                                    [params.batch_size, params.max_hypothesis_length, params.vector_size],
                                     'hypothesis')
         self.__evi = tf.placeholder(tf.float32,
-                                    [model.batch_size, model.max_evidence_length, model.vector_size],
+                                    [params.batch_size, params.max_evidence_length, params.vector_size],
                                     'evidence')
         self.__y = tf.placeholder(tf.float32,
-                                  [model.batch_size, model.n_classes],
+                                  [params.batch_size, params.n_classes],
                                   'label')
 
-        self.__lstm_back = tf.keras.layers.LSTMCell(model.hidden_size)
+        self.__input_keep = tf.placeholder_with_default(0.1, shape=())
+        self.__output_keep = tf.placeholder_with_default(1.0, shape=())
+        self.__static_keep = tf.placeholder_with_default(1.0, shape=())
+
+        self.__lstm_back = tf.keras.layers.LSTMCell(params.hidden_size)
         self.__lstm_drop_back = tf.contrib.rnn.DropoutWrapper(self.__lstm_back,
-                                                              model.input_keep,
-                                                              model.output_keep)
-        self.__lstm = tf.keras.layers.LSTMCell(model.hidden_size)
+                                                              input_keep_prob=self.__input_keep,
+                                                              output_keep_prob=self.__output_keep,
+                                                              static_keep_prob=self.__static_keep)
+        self.__lstm = tf.keras.layers.LSTMCell(params.hidden_size)
         self._lstm_drop = tf.contrib.rnn.DropoutWrapper(self.__lstm,
-                                                        model.input_keep,
-                                                        model.output_keep)
+                                                        input_keep_prob=self.__input_keep,
+                                                        output_keep_prob=self.__output_keep,
+                                                        static_keep_prob=self.__static_keep)
 
         self.__fc_initializer = tf.random_normal_initializer(stddev=0.1)
         self.__fc_weight = tf.get_variable('fc_weight',
-                                           [2 * model.hidden_size, model.n_classes],
+                                           [2 * params.hidden_size, params.n_classes],
                                            initializer=self.__fc_initializer)
         self.__fc_bias = tf.get_variable('bias',
-                                         [model.n_classes])
+                                         [params.n_classes])
         tf.add_to_collection(tf.GraphKeys.REGULARIZATION_LOSSES,
                              tf.nn.l2_loss(self.__fc_weight))
 
         self.__input = tf.concat([self.__hyp, self.__evi], 1)
         self.__input = tf.transpose(self.__input, [1, 0, 2])
-        self.__input = tf.reshape(self.__input, [-1, model.vector_size])
-        self.__input = tf.split(self.__input, model.max_hypothesis_length + model.max_evidence_length, )
+        self.__input = tf.reshape(self.__input, [-1, params.vector_size])
+        self.__input = tf.split(self.__input, params.max_hypothesis_length + params.max_evidence_length, )
 
         self.__rnn_outputs, _, _ = tf.contrib.rnn.static_bidirectional_rnn(self.__lstm,
                                                                            self.__lstm_back,
@@ -51,8 +56,8 @@ class LSTM:
         self.__loss = None
         self.__total_loss = None
 
-        self.valid_iters = 20000
-        self.test_iters = 20000
+        self.valid_iters = 100000
+        self.test_iters = 100000
 
     def setup_accuracy_scope(self):
         with tf.variable_scope('Accuracy'):
@@ -67,17 +72,17 @@ class LSTM:
             cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.__classification_scores,
                                                                        labels=self.__y)
             self.__loss = tf.reduce_mean(cross_entropy)
-            self.__total_loss = self.__loss + self.__model.weight_decay * \
-                                tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
+            self.__total_loss = self.__loss + self.__params.weight_decay * tf.add_n(
+                tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 
     def train(self, data_feature_list, correct_scores, save=None):
-        optimizer = tf.train.AdamOptimizer(self.__model.learning_rate).minimize(self.__total_loss)
+        optimizer = tf.train.AdamOptimizer(self.__params.learning_rate).minimize(self.__total_loss)
         init = tf.global_variables_initializer()
 
         sess = tf.Session()
         sess.run(init)
 
-        training_iterations = range(0, self.__model.iterations, self.__model.batch_size)
+        training_iterations = range(0, self.__params.iterations, self.__params.batch_size)
         training_iterations = tqdm(training_iterations)
 
         avg_acc = 0.0
@@ -86,7 +91,7 @@ class LSTM:
         with tf.device("/device:GPU:0"):
             for i in training_iterations:
                 batch = np.random.randint(data_feature_list[0].shape[0],
-                                          size=self.__model.batch_size)
+                                          size=self.__params.batch_size)
                 hyps = data_feature_list[0][batch, :]
                 evis = data_feature_list[1][batch, :]
                 ys = correct_scores[batch]
@@ -94,7 +99,7 @@ class LSTM:
                 sess.run([optimizer], feed_dict={self.__hyp: hyps,
                                                  self.__evi: evis,
                                                  self.__y: ys})
-                if (i / self.__model.batch_size) % self.__model.display_step == 0:
+                if (i / self.__params.batch_size) % self.__params.display_step == 0 and i != 0:
                     acc = sess.run(self.__accuracy, feed_dict={self.__hyp: hyps,
                                                                self.__evi: evis,
                                                                self.__y: ys})
@@ -103,15 +108,15 @@ class LSTM:
                                                                 self.__y: ys})
                     avg_acc = avg_acc + acc
                     avg_loss = avg_loss + tmp_loss
-                    print("Iter " + str(i / self.__model.batch_size) +
-                          ", Minibatch Loss = " + "{:.6f}".format(tmp_loss) +
+                    print("Iter " + str(i / self.__params.batch_size) +
+                          ", Minibatch Loss = " + "{:.5f}".format(tmp_loss) +
                           ", Training Accuracy = " + "{:.5f}".format(acc))
 
             print("------------------------------------------------------------------------------")
-            print("Training Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(training_iterations.iterable) *
-                                                                 self.__model.display_step) +
+            print("Training Minibatch Loss = " + "{:.5f}".format(avg_loss / len(training_iterations.iterable) *
+                                                                 self.__params.display_step) +
                   ", Training Accuracy = " + "{:.5f}".format(avg_acc / len(training_iterations.iterable) *
-                                                             self.__model.display_step))
+                                                             self.__params.display_step))
             print("------------------------------------------------------------------------------")
 
         if save is not None:
@@ -121,7 +126,7 @@ class LSTM:
         return sess
 
     def validate(self, data_feature_list, correct_scores, sess):
-        validation_iterations = range(0, self.valid_iters, self.__model.batch_size)
+        validation_iterations = range(0, self.valid_iters, self.__params.batch_size)
         validation_iterations = tqdm(validation_iterations)
         acc = 0.0
         tmp_loss = 0.0
@@ -129,7 +134,7 @@ class LSTM:
         with tf.device("/device:GPU:0"):
             for _ in validation_iterations:
                 batch = np.random.randint(data_feature_list[0].shape[0],
-                                          size=self.__model.batch_size)
+                                          size=self.__params.batch_size)
                 hyps = data_feature_list[0][batch, :]
                 evis = data_feature_list[1][batch, :]
                 ys = correct_scores[batch]
@@ -137,22 +142,25 @@ class LSTM:
                 sess.run([self.__classification_scores],
                          feed_dict={self.__hyp: hyps,
                                     self.__evi: evis,
-                                    self.__y: ys})
+                                    self.__y: ys,
+                                    self.__input_keep: 1.0})
                 acc = acc + sess.run(self.__accuracy,
                                      feed_dict={self.__hyp: hyps,
                                                 self.__evi: evis,
-                                                self.__y: ys})
+                                                self.__y: ys,
+                                                self.__input_keep: 1.0})
                 tmp_loss = tmp_loss + sess.run(self.__total_loss,
                                                feed_dict={self.__hyp: hyps,
                                                           self.__evi: evis,
-                                                          self.__y: ys})
+                                                          self.__y: ys,
+                                                          self.__input_keep: 1.0})
 
             print("Validation Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(validation_iterations.iterable)) +
                   ", Validation Accuracy = " + "{:.5f}".format(acc / len(validation_iterations.iterable)))
             print("------------------------------------------------------------------------------")
 
     def test(self, data_feature_list, correct_scores, sess):
-        testing_iterations = range(0, self.test_iters, self.__model.batch_size)
+        testing_iterations = range(0, self.test_iters, self.__params.batch_size)
         testing_iterations = tqdm(testing_iterations)
         acc = 0.0
         tmp_loss = 0.0
@@ -160,7 +168,7 @@ class LSTM:
         with tf.device("/device:GPU:0"):
             for _ in testing_iterations:
                 batch = np.random.randint(data_feature_list[0].shape[0],
-                                          size=self.__model.batch_size)
+                                          size=self.__params.batch_size)
                 hyps = data_feature_list[0][batch, :]
                 evis = data_feature_list[1][batch, :]
                 ys = correct_scores[batch]
@@ -168,15 +176,18 @@ class LSTM:
                 sess.run([self.__classification_scores],
                          feed_dict={self.__hyp: hyps,
                                     self.__evi: evis,
-                                    self.__y: ys})
+                                    self.__y: ys,
+                                    self.__input_keep: 1.0})
                 acc = acc + sess.run(self.__accuracy,
                                      feed_dict={self.__hyp: hyps,
                                                 self.__evi: evis,
-                                                self.__y: ys})
+                                                self.__y: ys,
+                                                self.__input_keep: 1.0})
                 tmp_loss = tmp_loss + sess.run(self.__loss,
                                                feed_dict={self.__hyp: hyps,
                                                           self.__evi: evis,
-                                                          self.__y: ys})
+                                                          self.__y: ys,
+                                                          self.__input_keep: 1.0})
 
             print("Testing Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(testing_iterations.iterable)) +
                   ", Testing Accuracy = " + "{:.5f}".format(acc / len(testing_iterations.iterable)))
@@ -184,17 +195,18 @@ class LSTM:
 
     def run_textual_entailment(self, evi_sentence, hyp_sentence):
         with tf.device("/device:GPU:0"):
-            evi_sentence = [self.__model.fit_to_size(np.vstack(
-                self.__model.sentence2sequence(evi_sentence)[0]),
-                (self.__model.max_evidence_length, self.__model.vector_size))]
+            evi_sentence = [self.__params.fit_to_size(np.vstack(
+                self.__params.sentence2sequence(evi_sentence)[0]),
+                (self.__params.max_evidence_length, self.__params.vector_size))]
 
-            hyp_sentence = [self.__model.fit_to_size(np.vstack(
-                self.__model.sentence2sequence(hyp_sentence)[0]),
-                (self.__model.max_hypothesis_length, self.__model.vector_size))]
+            hyp_sentence = [self.__params.fit_to_size(np.vstack(
+                self.__params.sentence2sequence(hyp_sentence)[0]),
+                (self.__params.max_hypothesis_length, self.__params.vector_size))]
 
-            prediction = self.__sess.run(self.__model.classification_scores,
-                                         feed_dict={self.__hyp: (evi_sentence * self.__model.batch_size),
-                                                    self.__evi: (hyp_sentence * self.__model.batch_size),
-                                                    self.__y: [[0, 0, 0]] * self.__model.batch_size})
+            prediction = self.__sess.run(self.__params.classification_scores,
+                                         feed_dict={self.__hyp: (evi_sentence * self.__params.batch_size),
+                                                    self.__evi: (hyp_sentence * self.__params.batch_size),
+                                                    self.__y: [[0, 0, 0]] * self.__params.batch_size,
+                                                    self.__input_keep: 1.0})
 
         return ["E", "N", "C"][np.argmax(prediction[0])]

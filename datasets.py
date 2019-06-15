@@ -3,25 +3,25 @@ from six.moves.urllib.request import urlretrieve
 import os
 import zipfile
 
-glove_6b_zip_file = "\\data\\GloVe\\glove.6B.zip"
-glove_vectors_50d = "\\data\\GloVe\\glove.6B.50d.txt"
-glove_vectors_100d = "\\data\\GloVe\\glove.6B.100d.txt"
-glove_vectors_200d = "\\data\\GloVe\\glove.6B.200d.txt"
-glove_vectors_300d = "\\data\\GloVe\\glove.6B.300d.txt"
+glove_6b_zip_file = os.getcwd() + "\\data\\GloVe\\glove.6B.zip"
+glove_vectors_50d = os.getcwd() + "\\data\\GloVe\\glove.6B.50d.txt"
+glove_vectors_100d = os.getcwd() + "\\data\\GloVe\\glove.6B.100d.txt"
+glove_vectors_200d = os.getcwd() + "\\data\\GloVe\\glove.6B.200d.txt"
+glove_vectors_300d = os.getcwd() + "\\data\\GloVe\\glove.6B.300d.txt"
 
-glove_840b_zip_file = "\\data\\GloVe\\glove.840B.300d.zip"
-glove_vectors_840B_300d = "\\data\\GloVe\\glove.840B.300d.txt"
+glove_840b_zip_file = os.getcwd() + "\\data\\GloVe\\glove.840B.300d.zip"
+glove_vectors_840B_300d = os.getcwd() + "\\data\\GloVe\\glove.840B.300d.txt"
 
-glove_twitter_zip_file = "\\data\\GloVe\\glove.twitter.27B.zip"
-glove_twitter_27B_25d = "\\data\\GloVe\\glove_twitter_27B_25d.txt"
-glove_twitter_27B_50d = "\\data\\GloVe\\glove_twitter_27B_50d.txt"
-glove_twitter_27B_100d = "\\data\\GloVe\\glove_twitter_27B_100d.txt"
-glove_twitter_27B_200d = "\\data\\GloVe\\glove_twitter_27B_200d.txt"
+glove_twitter_zip_file = os.getcwd() + "\\data\\GloVe\\glove.twitter.27B.zip"
+glove_twitter_27B_25d = os.getcwd() + "\\data\\GloVe\\glove_twitter_27B_25d.txt"
+glove_twitter_27B_50d = os.getcwd() + "\\data\\GloVe\\glove_twitter_27B_50d.txt"
+glove_twitter_27B_100d = os.getcwd() + "\\data\\GloVe\\glove_twitter_27B_100d.txt"
+glove_twitter_27B_200d = os.getcwd() + "\\data\\GloVe\\glove_twitter_27B_200d.txt"
 
-snli_zip_file = "\\data\\SNLI\\snli_1.0.zip"
-snli_dev_file = "\\data\\SNLI\\snli_1.0_dev.txt"
-snli_test_file = "\\data\\SNLI\\snli_1.0_test.txt"
-snli_full_dataset_file = "\\data\\SNLI\\snli_1.0_train.txt"
+snli_zip_file = os.getcwd() + "\\data\\SNLI\\snli_1.0.zip"
+snli_dev_file = os.getcwd() + "\\data\\SNLI\\snli_1.0_dev.txt"
+snli_test_file = os.getcwd() + "\\data\\SNLI\\snli_1.0_test.txt"
+snli_full_dataset_file = os.getcwd() + "\\data\\SNLI\\snli_1.0_train.txt"
 
 
 class CheckDownloadUnzipData:
