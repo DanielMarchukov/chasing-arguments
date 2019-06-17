@@ -6,19 +6,21 @@ import time
 import datetime
 
 
-class Params:
-    def __init__(self):
-        self.max_hypothesis_length = 30
-        self.max_evidence_length = 30
-        self.batch_size = 512
-        self.hidden_size = 1024
-        self.vector_size = 128
-        self.n_classes = 3
-        self.weight_decay = 0.95
-        self.learning_rate = 0.001
-        self.iterations = 5000000
-        self.display_step = 100
+class Preprocessor:
+    def __init__(self, evidence_length, hypothesis_length, vector_size):
+        self.__evidence_length = evidence_length
+        self.__hypothesis_length = hypothesis_length
+        self.__vector_size = vector_size
         self.__glove_word_map = {}
+
+    def get_evidence_length(self):
+        return self.__evidence_length
+
+    def get_hypothesis_length(self):
+        return self.__hypothesis_length
+
+    def get_vector_size(self):
+        return self.__vector_size
 
     def setup_word_map(self, file):
         with open(file, "r", encoding="utf-8") as glove:
@@ -88,11 +90,11 @@ class Params:
                 evi_sentences.append(np.vstack(self.sentence2sequence(row["sentence2"].lower())[0]))
                 scores.append(self.score_setup(row))
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking hyp_sentences...")
-        hyp_sentences = np.stack([self.fit_to_size(x, (self.max_hypothesis_length, self.vector_size))
+        hyp_sentences = np.stack([self.fit_to_size(x, (self.__hypothesis_length, self.__vector_size))
                                   for x in hyp_sentences])
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking evi_sentences...")
-        evi_sentences = np.stack([self.fit_to_size(x, (self.max_evidence_length, self.vector_size))
+        evi_sentences = np.stack([self.fit_to_size(x, (self.__evidence_length, self.__vector_size))
                                   for x in evi_sentences])
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " update_data_scores: Done.")
