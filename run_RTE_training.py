@@ -11,7 +11,7 @@ import datasets
 
 
 class TextualEntailment:
-    def __init__(self):
+    def __init__(self, is_training=False):
         # print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
         #       " Checking for data sets, downloading if needed...")
         # data.check_all_unzip()
@@ -22,6 +22,13 @@ class TextualEntailment:
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
               " Setting up GloVe word map...")
         self.__preproc.setup_word_map(file=datasets.glove_vectors_840B_300d)
+        self.__df_list = None
+        self.__c_scores = None
+
+        if is_training:
+            print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
+                  " Updating data scores for training...")
+            self.__df_list, self.__c_scores = self.__preproc.update_data_scores(file=datasets.snli_full_dataset_file)
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Initializing LSTM...")
         self.__lstm = LSTM(e_length=self.__preproc.get_evidence_length(),
@@ -37,38 +44,34 @@ class TextualEntailment:
                                                    (self.__preproc.get_hypothesis_length(),
                                                     self.__preproc.get_vector_size()))]
 
-        result = self.__lstm.run_textual_entailment(evi_sentence, hyp_sentence)
+        result = self.__lstm.run_prediction(evi_sentence, hyp_sentence)
         return result
 
     def load_session(self, path_to_model):
         self.__lstm.load_session(path=path_to_model)
 
     def run_training(self, save_as):
-        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
-              " Updating data scores for training...")
-        data_feature_list, correct_scores = self.__preproc.update_data_scores(file=datasets.snli_full_dataset_file)
-
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting training...")
-        self.__lstm.train(df_list=data_feature_list, c_scores=correct_scores, save=save_as)
+        self.__lstm.train(df_list=self.__df_list, c_scores=self.__c_scores, save=save_as)
 
     def run_validation(self):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
               " Updating data scores for validation...")
-        data_feature_list, correct_scores = self.__preproc.update_data_scores(file=datasets.snli_dev_file)
+        self.__df_list, self.__c_scores = self.__preproc.update_data_scores(file=datasets.snli_dev_file)
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting validation...")
-        self.__lstm.validate(df_list=data_feature_list, c_scores=correct_scores)
+        self.__lstm.validate(df_list=self.__df_list, c_scores=self.__c_scores)
 
     def run_test(self):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
               " Updating data scores for testing...")
-        data_feature_list, correct_scores = self.__preproc.update_data_scores(file=datasets.snli_test_file)
+        self.__df_list, self.__c_scores = self.__preproc.update_data_scores(file=datasets.snli_test_file)
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting testing...")
-        self.__lstm.test(df_list=data_feature_list, c_scores=correct_scores)
+        self.__lstm.test(df_list=self.__df_list, c_scores=self.__c_scores)
 
 
-rte = TextualEntailment()
-rte.run_training(save_as="rnn-128d-1024h-lr-001-final")
+rte = TextualEntailment(is_training=True)
+rte.run_training(save_as="rnn-128d-1024h-lr-0005-final")
 
 # rnn-128d-1024h-out-10-lr-001-final
 model_path = os.getcwd() + '\\models\\rnn-840B-128d-1024h-final'

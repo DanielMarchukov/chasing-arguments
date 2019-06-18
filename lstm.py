@@ -15,7 +15,7 @@ class LSTM:
         self.__vector_size = v_size
         self.__n_classes = 3
         self.__weight_decay = 0.95
-        self.__learning_rate = 0.01
+        self.__learning_rate = 0.0005
         self.__iterations = 5000000
         self.__display_step = 100
         self.__valid_iters = 100000
@@ -193,7 +193,7 @@ class LSTM:
                   ", Testing Accuracy = " + "{:.5f}".format(acc / len(testing_iterations.iterable)))
             print("------------------------------------------------------------------------------")
 
-    def run_textual_entailment(self, evi_sentence, hyp_sentence):
+    def run_prediction(self, evi_sentence, hyp_sentence):
         with tf.device("/device:GPU:0"):
             prediction = self.__sess.run(self.__classification_scores,
                                          feed_dict={self.__hyp: (evi_sentence * self.__batch_size),
