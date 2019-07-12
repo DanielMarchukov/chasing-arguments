@@ -4,7 +4,6 @@ from lstm import LSTM
 
 import numpy as np
 
-import os
 import time
 import datetime
 import datasets
@@ -12,12 +11,12 @@ import datasets
 
 class TextualEntailment:
     def __init__(self, is_training=False):
-        # print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
-        #       " Checking for data sets, downloading if needed...")
-        # data.check_all_unzip()
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
+              " Checking for data sets, downloading if needed...")
+        data.check_all_unzip()
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Initializing preproc...")
-        self.__preproc = Preprocessor(evidence_length=30, hypothesis_length=30, vector_size=128)
+        self.__preproc = Preprocessor(evidence_length=30, hypothesis_length=30, vector_size=216)
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
               " Setting up GloVe word map...")
@@ -47,8 +46,8 @@ class TextualEntailment:
         result = self.__lstm.run_prediction(evi_sentence, hyp_sentence)
         return result
 
-    def load_session(self, path_to_model):
-        self.__lstm.load_session(path=path_to_model)
+    def load_model(self, path_to_model):
+        self.__lstm.load_model(path=path_to_model)
 
     def run_training(self, save_as):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting training...")
@@ -68,17 +67,3 @@ class TextualEntailment:
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting testing...")
         self.__lstm.test(df_list=self.__df_list, c_scores=self.__c_scores)
-
-
-rte = TextualEntailment(is_training=True)
-rte.run_training(save_as="rnn-128d-1024h-lr-0005-final")
-
-# rnn-128d-1024h-out-10-lr-001-final
-model_path = os.getcwd() + '\\models\\rnn-840B-128d-1024h-final'
-restore = False
-if restore:
-    print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Restoring model...")
-    rte.load_session(model_path)
-
-rte.run_validation()
-rte.run_test()

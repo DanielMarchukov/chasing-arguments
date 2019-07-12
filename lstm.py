@@ -10,16 +10,16 @@ class LSTM:
     def __init__(self, e_length, h_length, v_size):
         self.__max_hypothesis_length = h_length
         self.__max_evidence_length = e_length
-        self.__batch_size = 512
-        self.__hidden_size = 1024
+        self.__batch_size = 256
+        self.__hidden_size = 2048
         self.__vector_size = v_size
         self.__n_classes = 3
         self.__weight_decay = 0.95
-        self.__learning_rate = 0.0005
-        self.__iterations = 5000000
+        self.__learning_rate = 0.001
+        self.__iterations = 8247280
         self.__display_step = 100
-        self.__valid_iters = 100000
-        self.__test_iters = 100000
+        self.__valid_iters = 147630
+        self.__test_iters = 147360
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None
@@ -45,7 +45,7 @@ class LSTM:
                                                         output_keep_prob=self.__output_keep,
                                                         state_keep_prob=self.__state_keep)
 
-        self.__fc_initializer = tf.random_normal_initializer(stddev=0.1)
+        self.__fc_initializer = tf.random_normal_initializer(stddev=0.2)
         self.__fc_weight = tf.get_variable('fc_weight', [2 * self.__hidden_size, self.__n_classes],
                                            initializer=self.__fc_initializer)
         self.__fc_bias = tf.get_variable('bias', [self.__n_classes])
@@ -82,7 +82,7 @@ class LSTM:
         print("TF Session Ended.")
         self.__sess.close()
 
-    def load_session(self, path):
+    def load_model(self, path):
         tf.train.Saver().restore(self.__sess, path)
 
     def get_evi_length(self):
@@ -161,7 +161,7 @@ class LSTM:
                                                                                     self.__evi: evis,
                                                                                     self.__labels: labels})
 
-            print("Validation Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(validation_iterations.iterable)) +
+            print("Validation Minibatch Loss = " + "{:.5f}".format(tmp_loss / len(validation_iterations.iterable)) +
                   ", Validation Accuracy = " + "{:.5f}".format(acc / len(validation_iterations.iterable)))
             print("------------------------------------------------------------------------------")
 
@@ -189,7 +189,7 @@ class LSTM:
                                                                               self.__evi: evis,
                                                                               self.__labels: labels})
 
-            print("Testing Minibatch Loss = " + "{:.6f}".format(tmp_loss / len(testing_iterations.iterable)) +
+            print("Testing Minibatch Loss = " + "{:.5f}".format(tmp_loss / len(testing_iterations.iterable)) +
                   ", Testing Accuracy = " + "{:.5f}".format(acc / len(testing_iterations.iterable)))
             print("------------------------------------------------------------------------------")
 
