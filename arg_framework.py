@@ -22,14 +22,15 @@ class ArgFramework:
         self.__af.add_edge(self.__arguments[u], self.__arguments[v], color=relation)
 
     def save(self):
-        with open('Argumentation_Framework_Colors.txt', mode="w") as file:
+        self.__pos = nx.spring_layout(self.__af)
+        with open('\\graph_data\\01_Argumentation_Framework_Colors.txt', mode="w") as file:
             for u, v in self.__af.edges():
                 file.write(self.__af[u][v]['color'])
-        nx.write_gexf(self.__af, 'Argumentation_Framework.gexf')
+        nx.write_gexf(self.__af, '\\graph_data\\01_Argumentation_Framework.gexf')
 
     def load(self):
-        self.__af = nx.read_gexf('Argumentation_Framework.gexf')
-        with open('Argumentation_Framework_Colors.txt', mode="r") as file:
+        self.__af = nx.read_gexf('\\graph_data\\01_Argumentation_Framework.gexf')
+        with open('\\graph_data\\01_Argumentation_Framework_Colors.txt', mode="r") as file:
             for line in file:
                 self.__colors.append(line)
 

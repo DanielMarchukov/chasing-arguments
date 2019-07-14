@@ -74,24 +74,20 @@ class TwitterMining:
     def camel_case_split(identifier):
         matches = finditer('(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', identifier)
         split_string = []
-        # index of beginning of slice
         previous = 0
         for match in matches:
-            # get slice
             split_string.append(identifier[previous:match.start()])
-            # advance index
             previous = match.start()
-        # get remaining string
         split_string.append(identifier[previous:])
         return split_string
 
-    def mine_data(self, query="Antifa", since="2019-07-01", count=10, lang="en"):
-        with open(self.__tweets_csv_path, mode='a') as file:
+    def mine_data(self, query="Antifa", since="2019-07-10", count=10, lang="en"):
+        with open(self.__tweets_csv_path, mode='w', encoding='utf-8', newline='') as file:
             file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             tweet_count = 0
             sentence_count = 0
-            for tweet in tweepy.Cursor(self.__api.search, q=query, lang=lang,
-                                       since=since, tweet_mode='extended').items(count):
+            for tweet in tweepy.Cursor(self.__api.search, q=query, lang=lang, since=since, tweet_mode='extended',
+                                       count=50).items(count):
                 if tweet.full_text.startswith("RT @"):
                     text = tweet.retweeted_status.full_text
                 else:
@@ -114,9 +110,9 @@ class TwitterMining:
                                 w = w.replace(".", "")
                                 filtered += w + " "
                     if len(filtered) > 30:
-                        file.writerow([sentence_count, tweet_count, tweet.created_at, tweet.user, tweet.retweet_count,
-                                       tweet.favorite_count, filtered + "."])
                         sentence_count = sentence_count + 1
+                        file.writerow([sentence_count, tweet_count, tweet.created_at, tweet.retweet_count,
+                                       tweet.favorite_count, filtered + "."])
                     filtered = ""
                 tweet_count = tweet_count + 1
 
