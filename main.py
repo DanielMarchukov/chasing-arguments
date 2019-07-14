@@ -25,9 +25,7 @@ class Main:
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
               + " Textual Entailment Training setup...")
         self.__rte = TextualEntailment(is_training=True)
-        self.__rte.run_training(save_as=model_name)
-        self.__rte.run_validation()
-        self.__rte.run_test()
+        self.__rte.train_valid_test_log(save_as=model_name)
 
     def load_lstm_model(self, model_name):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')

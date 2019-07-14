@@ -67,3 +67,9 @@ class TextualEntailment:
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Starting testing...")
         self.__lstm.test(df_list=self.__df_list, c_scores=self.__c_scores)
+
+    def train_valid_test_log(self, save_as):
+        self.run_training(save_as=save_as)
+        self.run_validation()
+        self.run_test()
+        self.__lstm.log_results()

@@ -2,14 +2,15 @@ from tqdm import tqdm
 
 import tensorflow as tf
 import numpy as np
+import csv
 import os
 
 
 # noinspection PyUnusedLocal
 class LSTM:
     def __init__(self, e_length, h_length, v_size):
-        self.__max_hypothesis_length = h_length
         self.__max_evidence_length = e_length
+        self.__max_hypothesis_length = h_length
         self.__batch_size = 256
         self.__hidden_size = 1024
         self.__vector_size = v_size
@@ -17,12 +18,19 @@ class LSTM:
         self.__weight_decay = 0.95
         self.__learning_rate = 0.001
         self.__iterations = 9000000
-        self.__display_step = 100
         self.__valid_iters = 147630
         self.__test_iters = 147360
+        self.__display_step = 100
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None
+        self.__training_accuracy = 0.0
+        self.__training_loss = 0.0
+        self.__validation_accuracy = 0.0
+        self.__validation_loss = 0.0
+        self.__testing_accuracy = 0.0
+        self.__testing_loss = 0.0
+        self.__log_file = os.getcwd() + "\\logs\\MODEL_TRAINING_RESULTS.csv"
 
         os.environ['TF_CPP_MIN_VLOG_LEVEL'] = '3'
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -130,11 +138,11 @@ class LSTM:
                     print("Iter " + str(i / self.__batch_size) + ", Minibatch Loss = " + "{:.5f}".format(tmp_loss) +
                           ", Training Accuracy = " + "{:.5f}".format(acc))
 
+            self.__training_loss = avg_loss / len(training_iterations.iterable) * self.__display_step
+            self.__training_accuracy = avg_acc / len(training_iterations.iterable) * self.__display_step
             print("------------------------------------------------------------------------------")
-            print("Training Minibatch Loss = " + "{:.5f}".format(avg_loss / len(training_iterations.iterable) *
-                                                                 self.__display_step) +
-                  ", Training Accuracy = " + "{:.5f}".format(avg_acc / len(training_iterations.iterable) *
-                                                             self.__display_step))
+            print("Training Minibatch Loss = " + "{:.5f}".format(self.__training_loss) +
+                  ", Training Accuracy = " + "{:.5f}".format(self.__training_accuracy))
             print("------------------------------------------------------------------------------")
 
         if save is not None:
@@ -165,8 +173,10 @@ class LSTM:
                                                                                     self.__evi: evis,
                                                                                     self.__labels: labels})
 
-            print("Validation Minibatch Loss = " + "{:.5f}".format(tmp_loss / len(validation_iterations.iterable)) +
-                  ", Validation Accuracy = " + "{:.5f}".format(acc / len(validation_iterations.iterable)))
+            self.__validation_loss = tmp_loss / len(validation_iterations.iterable)
+            self.__validation_accuracy = acc / len(validation_iterations.iterable)
+            print("Validation Minibatch Loss = " + "{:.5f}".format(self.__validation_loss) +
+                  ", Validation Accuracy = " + "{:.5f}".format(self.__validation_accuracy))
             print("------------------------------------------------------------------------------")
 
     def test(self, df_list, c_scores):
@@ -193,9 +203,28 @@ class LSTM:
                                                                               self.__evi: evis,
                                                                               self.__labels: labels})
 
-            print("Testing Minibatch Loss = " + "{:.5f}".format(tmp_loss / len(testing_iterations.iterable)) +
-                  ", Testing Accuracy = " + "{:.5f}".format(acc / len(testing_iterations.iterable)))
+            self.__testing_loss = tmp_loss / len(testing_iterations.iterable)
+            self.__testing_accuracy = acc / len(testing_iterations.iterable)
+            print("Testing Minibatch Loss = " + "{:.5f}".format(self.__testing_loss) +
+                  ", Testing Accuracy = " + "{:.5f}".format(self.__testing_accuracy))
             print("------------------------------------------------------------------------------")
+
+    def log_results(self):
+        if not os.path.isfile(self.__log_file):
+            with open(self.__log_file, mode='w', encoding='utf-8', newline='') as file:
+                file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                file.writerow(["MAX_E_LENGTH", "MAX_H_LENGTH", "BATCH_SIZE", "HIDDEN_SIZE", "VECTOR_SIZE", "N_CLASSES",
+                               "WEIGHT_DECAY", "LEARNING_RATE", "TRAIN_ITERS", "VALID_ITERS", "TEST_ITERS",
+                               "DISPLAY_STEP", "TRAIN_ACC", "TRAIN_LOSS", "VALID_ACC", "VALID_LOSS", "TEST_ACC",
+                               "TEST_LOSS"])
+        with open(self.__log_file, mode='a', encoding='utf-8', newline='') as file:
+            file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            file.writerow([self.__max_evidence_length, self.__max_hypothesis_length, self.__batch_size,
+                           self.__hidden_size, self.__vector_size, self.__n_classes, self.__weight_decay,
+                           self.__learning_rate, self.__iterations, self.__valid_iters, self.__test_iters,
+                           self.__display_step, self.__training_accuracy, self.__training_loss,
+                           self.__validation_accuracy, self.__validation_loss, self.__testing_accuracy,
+                           self.__testing_loss])
 
     def run_prediction(self, evi_sentence, hyp_sentence):
         with tf.device("/device:GPU:0"):
