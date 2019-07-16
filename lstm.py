@@ -17,10 +17,10 @@ class LSTM:
         self.__n_classes = 3
         self.__weight_decay = 0.95
         self.__learning_rate = 0.001
-        self.__iterations = 9000000
+        self.__iterations = 5500000
         self.__valid_iters = 147630
         self.__test_iters = 147360
-        self.__display_step = 100
+        self.__display_step = 256
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None
@@ -91,7 +91,6 @@ class LSTM:
         self.__sess.run(tf.global_variables_initializer())
 
     def __del__(self):
-        print("TF Session Ended.")
         self.__sess.close()
 
     def load_model(self, path):

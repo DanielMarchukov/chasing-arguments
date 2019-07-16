@@ -9,17 +9,22 @@ import os
 
 
 class Main:
-    def __init__(self):
+    def __init__(self, use_sentences=False):
         self.__af = ArgFramework()
         self.__twitter = None
         self.__rte = None
+        self.__lstm_results_csv = os.getcwd() + "\\logs\\LSTM_PREDICTION_RESULTS.csv"
+        self.__use_sentences = use_sentences
         self.__sentences = []
 
     def setup_twitter_data(self, tweet_count):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Connecting to Twitter...")
         self.__twitter = TwitterMining()
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Mining data...")
-        self.__twitter.mine_data(count=tweet_count)
+        if self.__use_sentences:
+            self.__twitter.mine_sentences(count=tweet_count)
+        else:
+            self.__twitter.mine_tweets(count=tweet_count)
 
     def train_lstm_model(self, model_name):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
@@ -35,27 +40,31 @@ class Main:
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Restoring model...")
         self.__rte.load_model(model_path)
 
-    def load_twitter_sentences(self):
+    def load_twitter_data(self):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Reading sentences...")
-        with open(self.__twitter.tweets_csv_path, mode='r', encoding="UTF-8") as file:
+        filepath = self.__twitter.sentences_csv_path if self.__use_sentences else self.__twitter.tweets_csv_path
+        with open(filepath, mode='r', encoding="UTF-8") as file:
             for line in file:
                 sent = line.split("|")[-1].rstrip()
-                # sent = split[-1].rstrip()
                 self.__sentences.append(sent)
 
     def run_model_on_twitter(self):
+        relation_count = 0
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Doing predictions...")
-        with open("lstm_results.csv", mode="w", encoding="UTF-8", newline='') as file:
+        with open(self.__lstm_results_csv, mode="w", encoding="UTF-8", newline='') as file:
             file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for i in range(len(self.__sentences)):
-                for j in range(i + 1, len(self.__sentences)):
+            for i in range(len(self.__sentences) - 1, 0, -1):
+                for j in range(i - 1, 0, -1):
                     res = self.__rte.run_predict(self.__sentences[j], self.__sentences[i])
-                    print(res)
                     if res == "E" or res == "C":
+                        relation_count = relation_count + 1
                         self.__af.add_argument(self.__sentences[j])
                         self.__af.add_argument(self.__sentences[i])
-                        self.__af.add_relation(self.__sentences[j], self.__sentences[i], 'r' if res in ["C"] else 'g')
-                        file.writerow([j, self.__sentences[j], res, i, self.__sentences[i]])
+                        self.__af.add_relation(self.__sentences[j], self.__sentences[i],
+                                               'cyan' if res in ["C"] else 'blue')
+                        file.writerow([j, res, i, self.__sentences[j], self.__sentences[i]])
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Calculated " +
+              str(relation_count) + " Argument Relations...")
 
     def save_argument_framework(self):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Saving...")
@@ -67,15 +76,18 @@ class Main:
 
 
 def main():
-    application = Main()
-    # application.setup_twitter_data(tweet_count=100)
-    application.train_lstm_model(model_name="RNN_vs216_b256_hs1024_ml30")
+    application = Main(use_sentences=False)
+    # application.setup_twitter_data(tweet_count=50)
+    application.train_lstm_model(model_name="RNN_vs128_b256_hs1024_ml30")
     # application.load_lstm_model(model_name="RNN_vs216_b256_hs1024_ml30")
-    # application.load_twitter_sentences()
+    # application.load_twitter_data()
     # application.run_model_on_twitter()
+
+    # do analysis here
+    # ...
+    #
     # application.save_argument_framework()
     # application.draw_argument_framework()
-    # do analysis
 
 
 if __name__ == "__main__":
