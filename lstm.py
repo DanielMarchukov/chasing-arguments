@@ -12,12 +12,12 @@ class LSTM:
         self.__max_evidence_length = e_length
         self.__max_hypothesis_length = h_length
         self.__batch_size = 256
-        self.__hidden_size = 1024
+        self.__hidden_size = 768
         self.__vector_size = v_size
         self.__n_classes = 3
         self.__weight_decay = 0.95
         self.__learning_rate = 0.001
-        self.__iterations = 5500000
+        self.__iterations = 5000000
         self.__valid_iters = 147630
         self.__test_iters = 147360
         self.__display_step = 256

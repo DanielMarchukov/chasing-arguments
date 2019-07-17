@@ -8,6 +8,10 @@ import time
 import datetime
 import datasets
 
+VECTOR_SIZE = 128
+EVIDENCE_LENGTH = 30
+HYPOTHESIS_LENGTH = 30
+
 
 class TextualEntailment:
     def __init__(self, is_training=False):
@@ -16,7 +20,8 @@ class TextualEntailment:
         data.check_all_unzip()
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Initializing preproc...")
-        self.__preproc = Preprocessor(evidence_length=30, hypothesis_length=30, vector_size=216)
+        self.__preproc = Preprocessor(evidence_length=EVIDENCE_LENGTH, hypothesis_length=HYPOTHESIS_LENGTH,
+                                      vector_size=VECTOR_SIZE)
 
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') +
               " Setting up GloVe word map...")

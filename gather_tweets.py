@@ -152,7 +152,8 @@ class TwitterMining:
                             filtered += w + " "
                 if len(filtered) > 40:
                     filtered = " ".join(filtered.split())
-                    file.writerow([tweet_count, tweet.created_at, tweet.retweet_count, tweet.favorite_count, filtered])
+                    file.writerow([tweet_count, tweet.created_at, tweet.retweet_count, tweet.favorite_count,
+                                   filtered.lower()])
                 tweet_count = tweet_count + 1
 
     @property

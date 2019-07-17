@@ -11,15 +11,14 @@ import os
 class Main:
     def __init__(self, use_sentences=False):
         self.__af = ArgFramework()
-        self.__twitter = None
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Setting up Twitter...")
+        self.__twitter = TwitterMining()
         self.__rte = None
         self.__lstm_results_csv = os.getcwd() + "\\logs\\LSTM_PREDICTION_RESULTS.csv"
         self.__use_sentences = use_sentences
         self.__sentences = []
 
     def setup_twitter_data(self, tweet_count):
-        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Connecting to Twitter...")
-        self.__twitter = TwitterMining()
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Mining data...")
         if self.__use_sentences:
             self.__twitter.mine_sentences(count=tweet_count)
@@ -61,10 +60,13 @@ class Main:
                         self.__af.add_argument(self.__sentences[j])
                         self.__af.add_argument(self.__sentences[i])
                         self.__af.add_relation(self.__sentences[j], self.__sentences[i],
-                                               'cyan' if res in ["C"] else 'blue')
+                                               'red' if res in ["C"] else 'green')
                         file.writerow([j, res, i, self.__sentences[j], self.__sentences[i]])
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Calculated " +
               str(relation_count) + " Argument Relations...")
+
+    def print_subsets(self):
+        self.__af.conflict_free_arguments()
 
     def save_argument_framework(self):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Saving...")
@@ -77,15 +79,14 @@ class Main:
 
 def main():
     application = Main(use_sentences=False)
-    # application.setup_twitter_data(tweet_count=50)
-    application.train_lstm_model(model_name="RNN_vs128_b256_hs1024_ml30")
-    # application.load_lstm_model(model_name="RNN_vs216_b256_hs1024_ml30")
+    # application.setup_twitter_data(tweet_count=15)
+    application.train_lstm_model(model_name="RNN_vs128_b256_hs768_ml30")
+    # application.load_lstm_model(model_name="RNN_vs128_b256_hs1024_ml30")
     # application.load_twitter_data()
     # application.run_model_on_twitter()
 
-    # do analysis here
-    # ...
-    #
+    # application.print_subsets()
+
     # application.save_argument_framework()
     # application.draw_argument_framework()
 
