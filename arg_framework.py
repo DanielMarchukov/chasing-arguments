@@ -3,6 +3,12 @@ import networkx as nx
 import itertools
 import os
 
+GRAPH_DATA_PATH = os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt'
+GRAPH_COLORS_PATH = os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt'
+
+ATTACK = 'red'
+SUPPORT = 'green'
+
 
 class ArgFramework:
     def __init__(self):
@@ -12,6 +18,12 @@ class ArgFramework:
         self.__arguments = {}
         self.__labels = {}
         self.__size = 0
+        self.__conflict_free = []
+        self.__admissible = []
+        self.__complete = []
+        self.__grounded = set()
+        self.__supporters = dict()
+        self.__grounded_must_haves = []
 
     def add_argument(self, arg):
         if arg not in self.__arguments:
@@ -24,15 +36,14 @@ class ArgFramework:
         self.__af.add_edge(self.__arguments[u], self.__arguments[v], color=relation)
 
     def save(self):
-        self.__pos = nx.fruchterman_reingold_layout(self.__af)
-        with open(os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt', mode="w") as file:
+        with open(GRAPH_DATA_PATH, mode="w") as file:
             for u, v in self.__af.edges():
                 file.write(self.__af[u][v]['color'] + "\n")
-        nx.write_gexf(self.__af, os.getcwd() + '\\graph_data\\01_Argumentation_Framework.gexf')
+        nx.write_gexf(self.__af, GRAPH_DATA_PATH)
 
     def load(self):
-        self.__af = nx.read_gexf('\\graph_data\\01_Argumentation_Framework.gexf')
-        with open(os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt', mode="r") as file:
+        self.__af = nx.read_gexf(GRAPH_DATA_PATH)
+        with open(GRAPH_COLORS_PATH, mode="r") as file:
             for line in file:
                 self.__colors.append(line)
 
@@ -41,32 +52,127 @@ class ArgFramework:
         plot.figure(figsize=(15, 15))
         edges = self.__af.edges()
         self.__colors = [self.__af[u][v]['color'] for u, v in edges]
-        layout = nx.spring_layout(self.__af, k=2, iterations=20)
-        nx.draw(self.__af, layout, edges=edges, edge_color=self.__colors, node_size=150, alpha=0.75)
-        nx.draw_networkx_labels(self.__af, layout, font_size=10)
+        self.__pos = nx.spring_layout(self.__af, k=2, iterations=20)
+        nx.draw(self.__af, self.__pos, edges=edges, edge_color=self.__colors, node_size=150, alpha=0.75)
+        nx.draw_networkx_labels(self.__af, self.__pos, font_size=10)
         plot.savefig(os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Graph_Spring.png', dpi=1000)
         plot.show()
+
+    def pre_setup(self):
+        for node in self.__af.nodes():
+            self.__supporters[node] = self.get_supporters(node, [])
+            must_have = True
+            for u, v in self.__af.in_edges(node):
+                if self.__af[u][v]['color'] == ATTACK:
+                    must_have = False
+                    break
+            if must_have:
+                self.__grounded_must_haves.append(node)
 
     def conflict_free_arguments(self):
         arguments = []
         for node in self.__af.nodes():
-            arguments.append(str(node))
+            arguments.append(node)
 
-        all_subsets = []
         for L in range(1, len(arguments) + 1):
             for subset in itertools.combinations(arguments, L):
-                all_subsets.append(subset)
+                has_conflict = False
+                for u, v in self.__af.edges():
+                    if set([u, v]).issubset(subset):
+                        if (self.__af.has_edge(u, v) and self.__af[u][v]['color'] == ATTACK) or \
+                                (self.__af.has_edge(v, u) and self.__af[v][u]['color'] == ATTACK):
+                            has_conflict = True
+                            break
+                if not has_conflict:
+                    self.__conflict_free.append(subset)
+                    print(subset)
+        # conflict_sets = []
+        # for u, v in self.__af.edges():
+        #     for subset in all_subsets:
+        #         if set([u, v]).issubset(subset):
+        #             if (self.__af.has_edge(u, v) and self.__af[u][v]['color'] == ATTACK) or \
+        #                     (self.__af.has_edge(v, u) and self.__af[v][u]['color'] == ATTACK):
+        #                 conflict_sets.append(subset)
 
-        conflict_sets = []
-        for u, v in self.__af.edges():
-            for subset in all_subsets:
-                if set([str(u), str(v)]).issubset(subset):
-                    if (self.__af.has_edge(u, v) and self.__af[u][v]['color'] == 'red') or \
-                            (self.__af.has_edge(v, u) and self.__af[v][u]['color'] == 'red'):
-                        conflict_sets.append(subset)
+        # for subset in all_subsets:
+        #     if subset not in conflict_sets:
+        #         self.__conflict_free.append(subset)
+        #         print(subset)
 
-        conflict_free = []
-        for subset in all_subsets:
-            if subset not in conflict_sets:
-                conflict_free.append(subset)
+    def admissible_arguments(self):
+        for subset in self.__conflict_free:
+            attackers = dict()
+            for n in subset:
+                for u, v in self.__af.in_edges(n):
+                    if self.__af[u][v]['color'] == ATTACK:
+                        attackers[u] = attackers.get(u, 0) + 1
+
+            for att in attackers.keys():
+                for deff in subset:
+                    if self.__af.has_edge(deff, att):
+                        if self.__af[deff][att]['color'] == ATTACK:
+                            attackers[att] = attackers[att] - 1
+                    else:
+                        for supp in self.__supporters[att]:
+                            if self.__af.has_edge(deff, supp) and self.__af[deff][supp]['color'] == ATTACK:
+                                attackers[att] = attackers[att] - 1
+            is_admissible = True
+            for att in attackers.keys():
+                if attackers[att] > 0:
+                    is_admissible = False
+                    break
+
+            if is_admissible:
+                self.__admissible.append(subset)
                 print(subset)
+
+    def get_supporters(self, a, nodelist):
+        for u, v in self.__af.in_edges(a):
+            if self.__af[u][v]['color'] == SUPPORT:
+                nodelist = self.get_supporters(u, nodelist)
+                nodelist.append(u)
+        return nodelist
+
+    def complete_extension(self):
+        added = dict()
+        non_complete = []
+        for i in range(len(self.__admissible) - 1, 0, -1):
+            for j in range(i - 1, -1, -1):
+                if j not in added.keys() and set(self.__admissible[j]).issubset(set(self.__admissible[i])):
+                    non_complete.append(set(self.__admissible[j]))
+                    added[j] = self.__admissible[j]
+
+        for subset in self.__admissible:
+            if set(subset) not in non_complete:
+                self.__complete.append(subset)
+                print(subset)
+
+    def grounded_extension(self):
+        intersect = [self.__complete[-1]]
+        for i in range(len(self.__complete) - 2, -1, -1):
+            intersect.append(set(intersect[-1]).intersection(self.__complete[i]))
+            if len(intersect[-1]) == 0:
+                self.__grounded = set(intersect[-2]).union(self.__grounded_must_haves)
+                return self.__grounded
+        self.__grounded = set(intersect[-1]).union(self.__grounded_must_haves)
+        return self.__grounded
+
+
+af = ArgFramework()
+af.add_argument("test1")
+af.add_argument("test2")
+af.add_argument("test3")
+af.add_argument("test4")
+af.add_relation("test1", "test2", SUPPORT)
+af.add_relation("test2", "test3", ATTACK)
+af.add_relation("test3", "test4", ATTACK)
+af.pre_setup()
+print("conflict frees:")
+af.conflict_free_arguments()
+print("admissibles:")
+af.admissible_arguments()
+print("completes:")
+af.complete_extension()
+print("grounded")
+print(af.grounded_extension())
+

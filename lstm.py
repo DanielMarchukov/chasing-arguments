@@ -228,8 +228,8 @@ class LSTM:
     def run_prediction(self, evi_sentence, hyp_sentence):
         with tf.device("/device:GPU:0"):
             prediction = self.__sess.run(self.__classification_scores,
-                                         feed_dict={self.__hyp: (evi_sentence * self.__batch_size),
-                                                    self.__evi: (hyp_sentence * self.__batch_size),
+                                         feed_dict={self.__hyp: (hyp_sentence * self.__batch_size),
+                                                    self.__evi: (evi_sentence * self.__batch_size),
                                                     self.__labels: [[0, 0, 0]] * self.__batch_size})
 
         return ["E", "N", "C"][np.argmax(prediction[0])]

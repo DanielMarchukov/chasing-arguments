@@ -1,6 +1,6 @@
 from gather_tweets import TwitterMining
 from textual_entailment import TextualEntailment
-from arg_framework import ArgFramework
+from arg_framework import ArgFramework, ATTACK, SUPPORT
 
 import datetime
 import time
@@ -53,15 +53,16 @@ class Main:
         with open(self.__lstm_results_csv, mode="w", encoding="UTF-8", newline='') as file:
             file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in range(len(self.__sentences) - 1, 0, -1):
-                for j in range(i - 1, 0, -1):
+                for j in range(i - 1, -1, -1):
                     res = self.__rte.run_predict(self.__sentences[j], self.__sentences[i])
                     if res == "E" or res == "C":
                         relation_count = relation_count + 1
                         self.__af.add_argument(self.__sentences[j])
                         self.__af.add_argument(self.__sentences[i])
                         self.__af.add_relation(self.__sentences[j], self.__sentences[i],
-                                               'red' if res in ["C"] else 'green')
+                                               ATTACK if res in ["C"] else SUPPORT)
                         file.writerow([j, res, i, self.__sentences[j], self.__sentences[i]])
+        self.__af.pre_setup()
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Calculated " +
               str(relation_count) + " Argument Relations...")
 
