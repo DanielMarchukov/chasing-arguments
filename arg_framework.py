@@ -5,6 +5,7 @@ import os
 
 GRAPH_DATA_PATH = os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt'
 GRAPH_COLORS_PATH = os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Colors.txt'
+IMAGE_PATH = os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Graph_Spring.png'
 
 ATTACK = 'red'
 SUPPORT = 'green'
@@ -25,6 +26,9 @@ class ArgFramework:
         self.__supporters = dict()
         self.__grounded_must_haves = []
 
+    def get_af(self):
+        return self.__af
+
     def add_argument(self, arg):
         if arg not in self.__arguments:
             self.__af.add_node(self.__size + 1, sentence=arg)
@@ -35,26 +39,28 @@ class ArgFramework:
     def add_relation(self, u, v, relation):
         self.__af.add_edge(self.__arguments[u], self.__arguments[v], color=relation)
 
-    def save(self):
-        with open(GRAPH_DATA_PATH, mode="w") as file:
+    def save(self, custom_path=None):
+        path = custom_path if custom_path else GRAPH_DATA_PATH
+        with open(path, mode="w") as file:
             for u, v in self.__af.edges():
                 file.write(self.__af[u][v]['color'] + "\n")
-        nx.write_gexf(self.__af, GRAPH_DATA_PATH)
+        nx.write_gexf(self.__af, path)
 
-    def load(self):
-        self.__af = nx.read_gexf(GRAPH_DATA_PATH)
+    def load(self, custom_path=None):
+        path = custom_path if custom_path else GRAPH_DATA_PATH
+        self.__af = nx.read_gexf(path)
         with open(GRAPH_COLORS_PATH, mode="r") as file:
             for line in file:
                 self.__colors.append(line)
 
     def draw(self):
         plot.axis('off')
-        plot.figure(figsize=(15, 15))
+        plot.figure(figsize=(10, 10))
         edges = self.__af.edges()
         self.__colors = [self.__af[u][v]['color'] for u, v in edges]
         self.__pos = nx.spring_layout(self.__af, k=2, iterations=20)
-        nx.draw(self.__af, self.__pos, edges=edges, edge_color=self.__colors, node_size=150, alpha=0.75)
-        nx.draw_networkx_labels(self.__af, self.__pos, font_size=10)
+        nx.draw(self.__af, self.__pos, edges=edges, edge_color=self.__colors, node_size=1000, alpha=0.75)
+        nx.draw_networkx_labels(self.__af, self.__pos, font_size=18)
         plot.savefig(os.getcwd() + '\\graph_data\\01_Argumentation_Framework_Graph_Spring.png', dpi=1000)
         plot.show()
 
@@ -85,19 +91,8 @@ class ArgFramework:
                             break
                 if not has_conflict:
                     self.__conflict_free.append(subset)
-                    print(subset)
-        # conflict_sets = []
-        # for u, v in self.__af.edges():
-        #     for subset in all_subsets:
-        #         if set([u, v]).issubset(subset):
-        #             if (self.__af.has_edge(u, v) and self.__af[u][v]['color'] == ATTACK) or \
-        #                     (self.__af.has_edge(v, u) and self.__af[v][u]['color'] == ATTACK):
-        #                 conflict_sets.append(subset)
-
-        # for subset in all_subsets:
-        #     if subset not in conflict_sets:
-        #         self.__conflict_free.append(subset)
-        #         print(subset)
+                    # print(subset)
+        return self.__conflict_free
 
     def admissible_arguments(self):
         for subset in self.__conflict_free:
@@ -124,13 +119,15 @@ class ArgFramework:
 
             if is_admissible:
                 self.__admissible.append(subset)
-                print(subset)
+                # print(subset)
+        return self.__admissible
 
     def get_supporters(self, a, nodelist):
-        for u, v in self.__af.in_edges(a):
-            if self.__af[u][v]['color'] == SUPPORT:
-                nodelist = self.get_supporters(u, nodelist)
-                nodelist.append(u)
+        if a not in nodelist:
+            for u, v in self.__af.in_edges(a):
+                if self.__af[u][v]['color'] == SUPPORT:
+                    nodelist.append(u)
+                    nodelist = self.get_supporters(u, nodelist)
         return nodelist
 
     def complete_extension(self):
@@ -145,7 +142,8 @@ class ArgFramework:
         for subset in self.__admissible:
             if set(subset) not in non_complete:
                 self.__complete.append(subset)
-                print(subset)
+                # print(subset)
+        return self.__complete
 
     def grounded_extension(self):
         intersect = [self.__complete[-1]]
@@ -158,21 +156,21 @@ class ArgFramework:
         return self.__grounded
 
 
-af = ArgFramework()
-af.add_argument("test1")
-af.add_argument("test2")
-af.add_argument("test3")
-af.add_argument("test4")
-af.add_relation("test1", "test2", SUPPORT)
-af.add_relation("test2", "test3", ATTACK)
-af.add_relation("test3", "test4", ATTACK)
-af.pre_setup()
-print("conflict frees:")
-af.conflict_free_arguments()
-print("admissibles:")
-af.admissible_arguments()
-print("completes:")
-af.complete_extension()
-print("grounded")
-print(af.grounded_extension())
+# af = ArgFramework()
+# af.add_argument("test1")
+# af.add_argument("test2")
+# af.add_argument("test3")
+# af.add_argument("test4")
+# af.add_relation("test1", "test2", SUPPORT)
+# af.add_relation("test2", "test3", ATTACK)
+# af.add_relation("test3", "test4", ATTACK)
+# af.pre_setup()
+# print("conflict frees:")
+# af.conflict_free_arguments()
+# print("admissibles:")
+# af.admissible_arguments()
+# print("completes:")
+# af.complete_extension()
+# print("grounded")
+# print(af.grounded_extension())
 

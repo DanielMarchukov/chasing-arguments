@@ -1,23 +1,454 @@
-red
-red
-red
-red
-red
-red
-red
-red
-green
-red
-red
-red
-red
-red
-red
-red
-red
-green
-green
-red
-green
-green
-red
+<?xml version='1.0' encoding='utf-8'?>
+<gexf version="1.2" xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes class="edge" mode="static">
+      <attribute id="1" title="color" type="string" />
+    </attributes>
+    <attributes class="node" mode="static">
+      <attribute id="0" title="sentence" type="string" />
+    </attributes>
+    <meta>
+      <creator>NetworkX 2.3</creator>
+      <lastmodified>15/08/2019</lastmodified>
+    </meta>
+    <nodes>
+      <node id="1" label="1">
+        <attvalues>
+          <attvalue for="0" value="You have been silent for 9 years that @Conservatives have subjected British families to poverty  @UKLabour have tabled a process to block no-deal Brexit while @Conservatives want to shut down Parliament to impose a no-deal  And you still blame Labour, this is perverse" />
+        </attvalues>
+      </node>
+      <node id="2" label="2">
+        <attvalues>
+          <attvalue for="0" value="&quot;@FaultFinderUK Legal challenge still ongoing (due to Labour's proven use of vote-riggers)  But your bio states that you &quot;&quot;bark at racists&quot;&quot; I suggest you trot on over to Finsbury Park,to the home of your Jew-hating comrade leader currently under investigation for exactly that  There's a good boy&quot;" />
+        </attvalues>
+      </node>
+      <node id="3" label="3">
+        <attvalues>
+          <attvalue for="0" value="Please retweet this EVERYWHERE to your Labour pals, and your tory trolls, your leavers, remainers, your dont know whatters  THIS is why we are hurtling towards no deal" />
+        </attvalues>
+      </node>
+      <node id="4" label="4">
+        <attvalues>
+          <attvalue for="0" value="Lol Lib Dems dont want to team up with labour and temporarily have Corbyn as PM (with no actual powers) but were more than happy to join thr conservatives! Shocking state of affairs" />
+        </attvalues>
+      </node>
+      <node id="5" label="5">
+        <attvalues>
+          <attvalue for="0" value="&quot;@dhothersall No one has yet defined &quot;&quot;brief&quot;&quot;   Once in power Labour may move the goalposts - see indyref2 as an example!&quot;" />
+        </attvalues>
+      </node>
+      <node id="6" label="6">
+        <attvalues>
+          <attvalue for="0" value="If the Lib Dems refuse to back Labour’s plan to stop a no deal Brexit and instead choose to damage communities across the UK for their own petty political posturing then I don’t think the public will ever forgive them" />
+        </attvalues>
+      </node>
+      <node id="7" label="7">
+        <attvalues>
+          <attvalue for="0" value="@stephenpaton134 I've always believed that an Independent Scotland could work with Corbyn labour England" />
+        </attvalues>
+      </node>
+      <node id="8" label="8">
+        <attvalues>
+          <attvalue for="0" value="Jeremy Corbyn has checkmated Jo Swinson &amp;amp; exposed the Lib Dems again for the vindictive charlatans they are  They've bleated for the last 3 years they want to stop Brexit, they want another vote, but when given the chance by Labour they refuse  #ReachOverTheNoise #YellowTories" />
+        </attvalues>
+      </node>
+      <node id="9" label="9">
+        <attvalues>
+          <attvalue for="0" value="Agree  and labour are even worse  So we are just country led by Cardiff centric Cartel" />
+        </attvalues>
+      </node>
+      <node id="10" label="10">
+        <attvalues>
+          <attvalue for="0" value="@kay_1773 Not quite correct  She (rightly in my view) counted out Corbyn, not Labour  She's apparently working closely with Watson" />
+        </attvalues>
+      </node>
+      <node id="11" label="11">
+        <attvalues>
+          <attvalue for="0" value="Anti-democratic MP Dominic Grieve this morning hints he could help install Labour leader, Jeremy Corbyn, an extreme Marxist into Downing Street in a bid to stop the people's instruction to leave the EU   How much more are the Conservatives going to take before expelling him?" />
+        </attvalues>
+      </node>
+      <node id="12" label="12">
+        <attvalues>
+          <attvalue for="0" value="@ChukaUmunna @joswinson @LibDems How the hell you were ever a Labour MP     It blows my mind how absolutely brain dead bonkers you are, and yet you think you're a serious MP?!  🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠" />
+        </attvalues>
+      </node>
+      <node id="13" label="13">
+        <attvalues>
+          <attvalue for="0" value="&quot;&quot;&quot;A caretaker government led by Labour in order to prevent a No Deal Brexit, and bring about a General Election   Under all normal parliamentary processes in Britain, the leader of the opposition takes over when the government collapses  &quot;&quot; @jeremycorbyn #JC4PM&quot;" />
+        </attvalues>
+      </node>
+      <node id="14" label="14">
+        <attvalues>
+          <attvalue for="0" value="Sorry, David; I am normally with you on whatever you write   But not with this   You don't seem to understand just how reviled Jeremy Corbyn is!  The man has to be deposed   He has to be got rid of   The Labour Party will only be able to look itself in the mirror afterwards  xx" />
+        </attvalues>
+      </node>
+      <node id="15" label="15">
+        <attvalues>
+          <attvalue for="0" value="@GeorgeAylett Ah    Labour inflexibility on full show again, combined with its usual effort to blame no deal on everyone else   Nothing to do with the fact that 114 Labour MPs abstained on JC’s orders on the Cherry a Revoke backstop on 1/4/2019    It lost by 112   No deal IS down to LP &amp;amp; JC" />
+        </attvalues>
+      </node>
+      <node id="16" label="16">
+        <attvalues>
+          <attvalue for="0" value="Rebecca Wrong Daily was being interviewed on SLY this morning and when she was being grilled and looking a bit harassed the communications went  down and the pictures disappeared  I’m sure this has happened with her before  God help us if Labour were running this country" />
+        </attvalues>
+      </node>
+      <node id="17" label="17">
+        <attvalues>
+          <attvalue for="0" value="Ardern will need to listen to Winston Peters and hope he enjoys good health  Without him, NZ First and his support her and Labour (NZ) are shot ducks and she’s not PM    High stakes Jacinda bashing Australia" />
+        </attvalues>
+      </node>
+      <node id="18" label="18">
+        <attvalues>
+          <attvalue for="0" value="Me: would sure love to have a family one day My body: pregnancy will destroy us, you’ll have to sleep on your back, go through labour and tear your vagina, it could prolapse plus all the physical and mental health risks Climate change: also there won’t be a planet left Me: :)" />
+        </attvalues>
+      </node>
+      <node id="19" label="19">
+        <attvalues>
+          <attvalue for="0" value="Honest to god, Lib Dems, Labour offered a potential way to stop No Deal, get Johnson out and that they'd campaign for a second referendum with an option to remain which is what you want  If you can stomach 5 years with the tories can you really not do two weeks with Corbyn as PM?" />
+        </attvalues>
+      </node>
+      <node id="20" label="20">
+        <attvalues>
+          <attvalue for="0" value="@MatthewR0226 @JulieOwenMoylan @JimMFelton Labour would most probably campaign for remain even with their deal on the table  So I don’t understand the problem with supporting this position  It would be almost impossible to get a second ref before a GE  There is no majority in parliament for it" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge id="0" source="1" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="1" source="3" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="2" source="3" target="1">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="3" source="4" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="4" source="4" target="9">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="5" source="4" target="1">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="6" source="4" target="3">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="7" source="5" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="8" source="5" target="1">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="9" source="5" target="3">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="10" source="5" target="4">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="11" source="6" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="12" source="6" target="9">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="13" source="6" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="14" source="6" target="11">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="15" source="6" target="10">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="16" source="6" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="17" source="7" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="18" source="7" target="3">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="19" source="7" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="20" source="7" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="21" source="7" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="22" source="7" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="23" source="8" target="2">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="24" source="8" target="3">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="25" source="8" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="26" source="8" target="11">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="27" source="8" target="10">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="28" source="8" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="29" source="8" target="6">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="30" source="8" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="31" source="8" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="32" source="8" target="16">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="33" source="10" target="3">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="34" source="10" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="35" source="11" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="36" source="12" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="37" source="13" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="38" source="13" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="39" source="14" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="40" source="14" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="41" source="14" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="42" source="15" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="43" source="15" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="44" source="15" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="45" source="16" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="46" source="16" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="47" source="16" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="48" source="16" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="49" source="17" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="50" source="17" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="51" source="17" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="52" source="17" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="53" source="18" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="54" source="18" target="10">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="55" source="18" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="56" source="18" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="57" source="18" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="58" source="19" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="59" source="19" target="10">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="60" source="19" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="61" source="19" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="62" source="19" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="63" source="20" target="5">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="64" source="20" target="12">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="65" source="20" target="13">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+      <edge id="66" source="20" target="15">
+        <attvalues>
+          <attvalue for="1" value="red" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

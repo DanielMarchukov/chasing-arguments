@@ -5,8 +5,6 @@ import os
 import re
 
 from re import finditer
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -14,9 +12,7 @@ from nltk import pos_tag
 
 
 class TwitterMining:
-
     def __init__(self):
-        self.__sentences_csv_path = os.getcwd() + '\\data\\Twitter\\sentences.csv'
         self.__tweets_csv_path = os.getcwd() + '\\data\\Twitter\\tweets.csv'
         self.__auth = tweepy.OAuthHandler(key_secret.consumer_key, key_secret.consumer_secret)
         self.__auth.set_access_token(key_secret.access_token, key_secret.access_token_secret)
@@ -82,48 +78,13 @@ class TwitterMining:
         split_string.append(identifier[previous:])
         return split_string
 
-    def mine_sentences(self, query="Antifa", since="2019-07-15", count=10, lang="en"):
-        with open(self.__sentences_csv_path, mode='w', encoding='utf-8', newline='') as file:
-            file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            tweet_count = 0
-            sentence_count = 0
-            for tweet in tweepy.Cursor(self.__api.search, q=query, lang=lang, since=since, tweet_mode='extended',
-                                       count=50, result_type='recent').items(count):
-                if tweet.full_text.startswith("RT @"):
-                    text = tweet.retweeted_status.full_text
-                else:
-                    text = tweet.full_text
-
-                if "http" in text:
-                    index = text.index("http")
-                    text = text[:0 - (len(text) - index)]
-
-                tokenized = sent_tokenize(text)
-                filtered = ""
-                for sentence in tokenized:
-                    sentence = re.sub(r'[^\w]', ' ', sentence)
-                    sentence = sentence.replace(".", "")
-                    words = word_tokenize(sentence)
-                    for word in words:
-                        for w in self.camel_case_split(word):
-                            if w not in self.__stop_words:
-                                tag = pos_tag([w])
-                                w = self.__lem.lemmatize(w, self.__tag_map[tag[0][1]])
-                                filtered += w + " "
-                    if len(filtered) > 30:
-                        sentence_count = sentence_count + 1
-                        file.writerow([sentence_count, tweet_count, tweet.created_at, tweet.retweet_count,
-                                       tweet.favorite_count, filtered])
-                    filtered = ""
-                tweet_count = tweet_count + 1
-
-    def mine_tweets(self, query="Brexit", since="2019-07-15", count=10, lang="en"):
+    def mine_tweets(self, query, since, count, lang="en"):
         with open(self.__tweets_csv_path, mode='w', encoding='utf-8', newline='') as file:
             file = csv.writer(file, delimiter='|', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             tweet_count = 0
             for tweet in tweepy.Cursor(self.__api.search, q=query, lang=lang, since=since, tweet_mode='extended',
-                                       count=50, result_type='recent').items(count):
-                if tweet.full_text.startswith("RT @"):
+                                       count=count, result_type='recent').items(count):
+                if tweet.full_text.startswith("RT @") and hasattr(tweet, 'retweeted_status'):
                     text = tweet.retweeted_status.full_text
                 else:
                     text = tweet.full_text
@@ -139,26 +100,43 @@ class TwitterMining:
                 for word in words:
                     if "@" in word:
                         continue
-                    if "&" in word:
-                        word = "and"
-                    word = word.replace("'", "")
-                    word = re.sub(r'[^\w]', '', word)
+                    word = self.remove_non_alphanumerical(word)
                     for w in self.camel_case_split(word):
                         if len(w) == 0 or w == " ":
                             continue
-                        if w not in self.__stop_words:
-                            tag = pos_tag([w])
-                            w = self.__lem.lemmatize(w, self.__tag_map[tag[0][1]])
-                            filtered += w + " "
-                if len(filtered) > 40:
-                    filtered = " ".join(filtered.split())
+                        if not self.is_stop_word(w):
+                            filtered += self.lemmatize(w) + " "
+                filtered = self.filter_shorts(filtered)
+                if filtered is not None:
                     file.writerow([tweet_count, tweet.created_at, tweet.retweet_count, tweet.favorite_count,
-                                   filtered.lower()])
-                tweet_count = tweet_count + 1
+                                   filtered.lower(), text.replace('\n', ' ').replace('\r', '').strip()])
+                    tweet_count = tweet_count + 1
 
-    @property
-    def sentences_csv_path(self):
-        return self.__sentences_csv_path
+    @staticmethod
+    def remove_non_alphanumerical(word):
+        if "&" in word:
+            word = "and"
+        word = word.replace("'", "")
+        word = re.sub(r'[^\w]', '', word)
+        return word
+
+    def is_stop_word(self, word):
+        if word in self.__stop_words:
+            return True
+        return False
+
+    def lemmatize(self, word):
+        tag = pos_tag([word])
+        word = self.__lem.lemmatize(word, self.__tag_map[tag[0][1]])
+        return word
+
+    @staticmethod
+    def filter_shorts(text):
+        if len(text) > 30:
+            text = " ".join(text.split())
+            return text
+        else:
+            return None
 
     @property
     def tweets_csv_path(self):

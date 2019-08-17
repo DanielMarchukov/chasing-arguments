@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plot
-import matplotlib.ticker as ticker
 import csv
 import time
 import datetime
@@ -28,32 +26,19 @@ class Preprocessor:
                 name, vector = tuple(line.split(" ", 1))
                 self.__glove_word_map[name] = np.fromstring(vector, sep=" ")
 
-    def visualize(self, sentence):
-        rows, words = self.sentence2sequence(sentence)
-        mat = np.vstack(rows)
-
-        fig = plot.figure()
-        ax = fig.add_subplot(111)
-        shown = ax.matshow(mat, aspect="auto")
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        fig.colorbar(shown)
-
-        ax.set_yticklabels([""] + words)
-        plot.show()
-
     @staticmethod
-    def score_setup(row):
-        convert_dict = {
+    def setup_score(row):
+        map_relation_to_val = {
             'entailment': 0,
             'neutral': 1,
             'contradiction': 2
         }
-        score = np.zeros((3,))
-        for x in range(1, 6):
-            tag = row["label" + str(x)]
-            if tag in convert_dict:
-                score[convert_dict[tag]] += 1
-        return score / (1.0 * np.sum(score))
+        values = np.zeros((3,))
+        for num in range(1, 6):
+            idx = row["label" + str(num)]
+            if idx in map_relation_to_val:
+                values[map_relation_to_val[idx]] += 1
+        return values / (1.0 * np.sum(values))
 
     @staticmethod
     def fit_to_size(matrix, shape):
@@ -62,7 +47,7 @@ class Preprocessor:
         res[tuple(slices)] = matrix[tuple(slices)]
         return res
 
-    def sentence2sequence(self, sentence):
+    def sent_to_seq(self, sentence):
         tokens = sentence.lower().split(" ")
         rows = []
         words = []
@@ -80,22 +65,22 @@ class Preprocessor:
         return rows, words
 
     def update_data_scores(self, file):
-        with open(file, "r") as data:
-            train = csv.DictReader(data, delimiter='\t')
-            evi_sentences = []
-            hyp_sentences = []
+        with open(file, "r") as dset:
+            file = csv.DictReader(dset, delimiter='\t')
+            evidences = []
+            hypotheses = []
             scores = []
-            for row in train:
-                hyp_sentences.append(np.vstack(self.sentence2sequence(row["sentence1"].lower())[0]))
-                evi_sentences.append(np.vstack(self.sentence2sequence(row["sentence2"].lower())[0]))
-                scores.append(self.score_setup(row))
-        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking hyp_sentences...")
-        hyp_sentences = np.stack([self.fit_to_size(x, (self.__hypothesis_length, self.__vector_size))
-                                  for x in hyp_sentences])
+            for line in file:
+                hypotheses.append(np.vstack(self.sent_to_seq(line["sentence1"].lower())[0]))
+                evidences.append(np.vstack(self.sent_to_seq(line["sentence2"].lower())[0]))
+                scores.append(self.setup_score(line))
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Stacking hypotheses...")
+        hypotheses = np.stack([self.fit_to_size(x, (self.__hypothesis_length, self.__vector_size))
+                               for x in hypotheses])
 
-        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " Stacking evi_sentences...")
-        evi_sentences = np.stack([self.fit_to_size(x, (self.__evidence_length, self.__vector_size))
-                                  for x in evi_sentences])
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Stacking evidences...")
+        evidences = np.stack([self.fit_to_size(x, (self.__evidence_length, self.__vector_size))
+                              for x in evidences])
 
-        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + " update_data_scores: Done.")
-        return (hyp_sentences, evi_sentences), np.array(scores)
+        print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": update_data_scores: Done.")
+        return (hypotheses, evidences), np.array(scores)

@@ -1,3 +1,6 @@
+import datetime
+import time
+
 from tqdm import tqdm
 
 import tensorflow as tf
@@ -11,16 +14,16 @@ class LSTM:
     def __init__(self, e_length, h_length, v_size):
         self.__max_evidence_length = e_length
         self.__max_hypothesis_length = h_length
-        self.__batch_size = 256
-        self.__hidden_size = 768
-        self.__vector_size = v_size
+        self.__batch_size = 2500  # 350 | 256
+        self.__hidden_size = 800  # 800 | 768
+        self.__vector_size = v_size  # 200 | 128
         self.__n_classes = 3
         self.__weight_decay = 0.95
         self.__learning_rate = 0.001
-        self.__iterations = 5000000
-        self.__valid_iters = 147630
-        self.__test_iters = 147360
-        self.__display_step = 256
+        self.__iterations = 6000000
+        self.__valid_iters = 200000
+        self.__test_iters = 200000
+        self.__display_step = 2200  # 256
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None
@@ -122,16 +125,19 @@ class LSTM:
                 self.__sess.run([self.__optimizer], feed_dict={self.__hyp: hyps,
                                                                self.__evi: evis,
                                                                self.__labels: labels,
-                                                               self.__input_keep: 0.1})
+                                                               self.__input_keep: 0.1,
+                                                               self.__output_keep: 0.2})
                 if (i / self.__batch_size) % self.__display_step == 0 and i != 0:
                     acc = self.__sess.run(self.__accuracy, feed_dict={self.__hyp: hyps,
                                                                       self.__evi: evis,
                                                                       self.__labels: labels,
-                                                                      self.__input_keep: 0.1})
+                                                                      self.__input_keep: 0.1,
+                                                                      self.__output_keep: 0.2})
                     tmp_loss = self.__sess.run(self.__loss, feed_dict={self.__hyp: hyps,
                                                                        self.__evi: evis,
                                                                        self.__labels: labels,
-                                                                       self.__input_keep: 0.1})
+                                                                       self.__input_keep: 0.1,
+                                                                       self.__output_keep: 0.2})
                     avg_acc = avg_acc + acc
                     avg_loss = avg_loss + tmp_loss
                     print("Iter " + str(i / self.__batch_size) + ", Minibatch Loss = " + "{:.5f}".format(tmp_loss) +
@@ -145,6 +151,8 @@ class LSTM:
             print("------------------------------------------------------------------------------")
 
         if save is not None:
+            print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                  + ": Finished Training Model. Saving...")
             saver = tf.train.Saver()
             saver.save(self.__sess, os.getcwd() + '\\models\\' + save)
 

@@ -35,7 +35,6 @@ class CheckDownloadUnzipData:
                         if output_file_name in info.filename:
                             with zipped.open(info) as requested_file:
                                 out_file.write(requested_file.read())
-                                return
 
     @staticmethod
     def check_glove_6b():
