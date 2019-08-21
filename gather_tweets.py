@@ -56,7 +56,7 @@ class TwitterMining:
             'WP': wn.NOUN,  # wh-pronoun (what, who)
             'WP$': wn.NOUN,  # possessive (wh- whose)
             'WRB': wn.NOUN,  # wh-adverb (how, where)
-            '$': wn.NOUN,  #  dollar sign ($)
+            '$': wn.NOUN,  # dollar sign ($)
             '#': wn.NOUN,  # pound sign (#)
             '“': wn.NOUN,  # left quote (‘ or “)
             '”': wn.NOUN,  # right quote (’ or ”)
@@ -94,7 +94,6 @@ class TwitterMining:
                     text = text[:0 - (len(text) - index)]
 
                 filtered = ""
-                # text = re.sub(r'[^\w]', ' ', text)
                 text = text.replace(".", " ")
                 words = text.split(' ')
                 for word in words:

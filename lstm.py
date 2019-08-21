@@ -14,16 +14,16 @@ class LSTM:
     def __init__(self, e_length, h_length, v_size):
         self.__max_evidence_length = e_length
         self.__max_hypothesis_length = h_length
-        self.__batch_size = 2500  # 350 | 256
+        self.__batch_size = 600  # 350 | 256
         self.__hidden_size = 800  # 800 | 768
         self.__vector_size = v_size  # 200 | 128
         self.__n_classes = 3
         self.__weight_decay = 0.95
         self.__learning_rate = 0.001
         self.__iterations = 6000000
-        self.__valid_iters = 200000
-        self.__test_iters = 200000
-        self.__display_step = 50  # 256
+        self.__valid_iters = 150000
+        self.__test_iters = 150000
+        self.__display_step = 256  # 256
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None
@@ -37,7 +37,7 @@ class LSTM:
 
         os.environ['TF_CPP_MIN_VLOG_LEVEL'] = '3'
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-        tf.logging.set_verbosity(tf.logging.ERROR)
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
         self.__hyp = tf.placeholder(tf.float32, [self.__batch_size, self.__max_hypothesis_length, self.__vector_size],
                                     'hypothesis')

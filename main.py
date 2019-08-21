@@ -24,7 +24,7 @@ class Main:
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Setting up Twitter...")
         self.__twitter = TwitterMining()
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Mining data...")
-        self.__twitter.mine_tweets(query=q, since=str(datetime.datetime.now()).split(" ")[0], count=tweet_count)
+        self.__twitter.mine_tweets(query=q[0], since=str(datetime.datetime.now()).split(" ")[0], count=tweet_count)
 
     def train_lstm_model(self, model_name):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Textual Entailment "
@@ -105,10 +105,10 @@ class Main:
 def main(query, model, is_training):
     application = Main()
     application.setup_twitter_data(tweet_count=20, q=query)
-    if is_training > 0:
-        application.train_lstm_model(model_name=model)
+    if is_training[0] > 0:
+        application.train_lstm_model(model_name=model[0])
     else:
-        application.load_lstm_model(model_name=model)  # "RNN_vs200_b350_hs800_ml30"
+        application.load_lstm_model(model_name=model[0])  # "RNN_vs200_b350_hs800_ml30"
     application.load_twitter_data()
     application.run_model_on_twitter()
     application.print_subsets()
@@ -119,11 +119,13 @@ def main(query, model, is_training):
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--training", nargs=1, type=int, default=0, help="0 - Load existing model. 1 - Perform "
                                                                          "training of model.", required=True)
-    parser.add_argument("--modelname", nargs=1, type=str, default="RNN_vs200_b350_hs800_ml30", help="If training, "
-                        "model name to save as, otherwise model name to load.", required=True)
+    parser.add_argument("--modelname", nargs=1, type=str, help="If training, model name to save as, otherwise model "
+                                                               "name to load.", required=True,
+                        default="RNN_vs200_b600_hs800_ml30")
     parser.add_argument("--query", nargs="*", type=str, help="Twitter search term.", required=True)
     args = parser.parse_args()
     main(query=args.query, model=args.modelname, is_training=args.training)
