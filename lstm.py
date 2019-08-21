@@ -23,7 +23,7 @@ class LSTM:
         self.__iterations = 6000000
         self.__valid_iters = 200000
         self.__test_iters = 200000
-        self.__display_step = 2200  # 256
+        self.__display_step = 50  # 256
         self.__accuracy = None
         self.__loss = None
         self.__total_loss = None

@@ -20,11 +20,11 @@ class Main:
         self.__sentences = []
         self.__result = None
 
-    def setup_twitter_data(self, tweet_count):
+    def setup_twitter_data(self, tweet_count, q):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Setting up Twitter...")
         self.__twitter = TwitterMining()
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Mining data...")
-        self.__twitter.mine_tweets(query="Labour", since="2019-08-14", count=tweet_count)
+        self.__twitter.mine_tweets(query=q, since=str(datetime.datetime.now()).split(" ")[0], count=tweet_count)
 
     def train_lstm_model(self, model_name):
         print(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + ": Textual Entailment "
@@ -102,18 +102,28 @@ class Main:
                     print(data[0] + " | " + data[1] + " | " + data[5], end='\n')
 
 
-def main():
+def main(query, model, is_training):
     application = Main()
-    # application.setup_twitter_data(tweet_count=20)
-    application.train_lstm_model(model_name="RNN_vs200_b1100_hs800_ml30")
-    # application.load_lstm_model(model_name="RNN_vs200_b350_hs800_ml30")
-    # application.load_twitter_data()
-    # application.run_model_on_twitter()
-    # application.print_subsets()
-    # application.save_argument_framework()
-    # application.draw_argument_framework()
-    # application.result_tweets()
+    application.setup_twitter_data(tweet_count=20, q=query)
+    if is_training > 0:
+        application.train_lstm_model(model_name=model)
+    else:
+        application.load_lstm_model(model_name=model)  # "RNN_vs200_b350_hs800_ml30"
+    application.load_twitter_data()
+    application.run_model_on_twitter()
+    application.print_subsets()
+    application.save_argument_framework()
+    application.draw_argument_framework()
+    application.result_tweets()
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--training", nargs=1, type=int, default=0, help="0 - Load existing model. 1 - Perform "
+                                                                         "training of model.", required=True)
+    parser.add_argument("--modelname", nargs=1, type=str, default="RNN_vs200_b350_hs800_ml30", help="If training, "
+                        "model name to save as, otherwise model name to load.", required=True)
+    parser.add_argument("--query", nargs="*", type=str, help="Twitter search term.", required=True)
+    args = parser.parse_args()
+    main(query=args.query, model=args.modelname, is_training=args.training)
